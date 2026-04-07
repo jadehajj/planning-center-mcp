@@ -5,7 +5,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ResponseFormat, DEFAULT_LIMIT, MAX_LIMIT, CHARACTER_LIMIT } from "../constants.js";
+import { ResponseFormat, CHARACTER_LIMIT } from "../constants.js";
+import { limitSchema, offsetSchema, responseFormatSchema } from "../schemas.js";
 import {
   pcoGet,
   handlePcoError,
@@ -58,10 +59,10 @@ Examples:
   - "Find groups named 'young adults'" → search_name="young adults"`,
       inputSchema: z.object({
         search_name: z.string().optional().describe("Partial group name to search for"),
-        limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
-        offset: z.number().int().min(0).default(0),
-        response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        limit: limitSchema,
+        offset: offsetSchema,
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

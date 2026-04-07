@@ -1,12 +1,12 @@
 /**
  * Planning Center Check-Ins tools.
  * Wraps: GET /check-ins/v2/check_ins
- *        GET /check-ins/v2/events
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ResponseFormat, DEFAULT_LIMIT, MAX_LIMIT, CHARACTER_LIMIT } from "../constants.js";
+import { ResponseFormat, CHARACTER_LIMIT } from "../constants.js";
+import { limitSchema, offsetSchema, responseFormatSchema } from "../schemas.js";
 import {
   pcoGet,
   handlePcoError,
@@ -27,13 +27,6 @@ interface CheckInAttributes {
   number?: number;
 }
 
-interface EventAttributes {
-  name?: string;
-  attendance_count?: number;
-  check_ins_count?: number;
-  created_at?: string;
-}
-
 export function registerCheckInsTools(server: McpServer): void {
   server.registerTool(
     "pc_list_checkins",
@@ -49,17 +42,15 @@ Args:
   - offset (number): Results to skip for pagination (default: 0)
   - response_format ('markdown' | 'json'): Output format (default: 'markdown')
 
-To find event IDs, call pc_list_checkins without event_id first and check the linked events, or use the PCO Check-Ins dashboard.
-
 Examples:
   - "Who checked in this Sunday?" → event_id="<event_id>"
   - "Show recent check-in activity" → no event_id`,
       inputSchema: z.object({
         event_id: z.string().optional().describe("Filter check-ins by event ID"),
-        limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
-        offset: z.number().int().min(0).default(0),
-        response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        limit: limitSchema,
+        offset: offsetSchema,
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

@@ -5,7 +5,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ResponseFormat, DEFAULT_LIMIT, MAX_LIMIT, CHARACTER_LIMIT } from "../constants.js";
+import { ResponseFormat, CHARACTER_LIMIT } from "../constants.js";
+import { limitSchema, offsetSchema, responseFormatSchema } from "../schemas.js";
 import {
   pcoGet,
   handlePcoError,
@@ -53,10 +54,10 @@ Examples:
   - "Show recent donations" → no extra params
   - "Get next page of donations" → offset=25`,
       inputSchema: z.object({
-        limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
-        offset: z.number().int().min(0).default(0),
-        response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        limit: limitSchema,
+        offset: offsetSchema,
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

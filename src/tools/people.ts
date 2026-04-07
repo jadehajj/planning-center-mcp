@@ -6,7 +6,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ResponseFormat, DEFAULT_LIMIT, MAX_LIMIT, CHARACTER_LIMIT } from "../constants.js";
+import { ResponseFormat, CHARACTER_LIMIT } from "../constants.js";
+import { limitSchema, offsetSchema, responseFormatSchema } from "../schemas.js";
 import {
   pcoGet,
   handlePcoError,
@@ -69,7 +70,7 @@ Returns (JSON format):
     "offset": number,
     "has_more": boolean,
     "next_offset": number | undefined,
-    "people": [{ "id": string, "name": string, "email": string, "status": string }]
+    "people": [{ "id": string, "name": string, "status": string }]
   }
 
 Examples:
@@ -78,12 +79,10 @@ Examples:
   - "Get next page" → offset=25`,
       inputSchema: z.object({
         search_name: z.string().optional().describe("Partial name to search for"),
-        limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
-        offset: z.number().int().min(0).default(0),
-        response_format: z
-          .nativeEnum(ResponseFormat)
-          .default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        limit: limitSchema,
+        offset: offsetSchema,
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -155,10 +154,8 @@ Examples:
   - Use pc_list_people first to find the ID if you only have a name`,
       inputSchema: z.object({
         person_id: z.string().min(1).describe("Planning Center person ID"),
-        response_format: z
-          .nativeEnum(ResponseFormat)
-          .default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

@@ -6,7 +6,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ResponseFormat, DEFAULT_LIMIT, MAX_LIMIT, CHARACTER_LIMIT } from "../constants.js";
+import { ResponseFormat, CHARACTER_LIMIT } from "../constants.js";
+import { limitSchema, offsetSchema, responseFormatSchema } from "../schemas.js";
 import {
   pcoGet,
   handlePcoError,
@@ -76,11 +77,11 @@ Examples:
   - "What services are coming up?" → no extra params
   - "Show Sunday morning plans" → service_type_id="<id from pc_list_services>"`,
       inputSchema: z.object({
-        limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
-        offset: z.number().int().min(0).default(0),
+        limit: limitSchema,
+        offset: offsetSchema,
         service_type_id: z.string().optional().describe("Filter to a specific service type ID"),
-        response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -90,7 +91,6 @@ Examples:
     },
     async ({ limit, offset, service_type_id, response_format }) => {
       try {
-        // Get service types
         let serviceTypes: PcoResource[];
         if (service_type_id) {
           const st = await pcoGet<PcoResource>(`/services/v2/service_types/${service_type_id}`);
@@ -169,8 +169,8 @@ Examples:
       inputSchema: z.object({
         service_type_id: z.string().min(1).describe("Service type ID"),
         plan_id: z.string().min(1).describe("Plan ID"),
-        response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
-      }).strict(),
+        response_format: responseFormatSchema,
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
