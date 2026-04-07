@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "functions": {
+    "api/mcp.ts": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/mcp",
+      "dest": "/api/mcp.ts"
+    },
+    {
+      "src": "/",
+      "dest": "/api/mcp.ts"
+    }
+  ]
+}
