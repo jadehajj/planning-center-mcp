@@ -1,6 +1,9 @@
 /**
- * Planning Center Online API client.
- * Uses Personal Access Token (App ID + Secret) via HTTP Basic Auth.
+ * Planning Center Online API client — extended with write methods.
+ *
+ * This file is a drop-in replacement for the original src/services/pco-client.ts.
+ * It adds pcoPost, pcoPatch, and pcoDelete while keeping pcoGet and all existing
+ * exports backward-compatible.
  */
 
 import axios, { AxiosError, AxiosInstance } from "axios";
@@ -67,6 +70,42 @@ export async function pcoGet<T>(
   const client = getClient();
   const response = await client.get<PcoResponse<T>>(path, { params });
   return response.data;
+}
+
+/**
+ * POST request — used to create resources or trigger actions.
+ * Body must follow JSON:API spec: { data: { type, attributes, relationships? } }
+ */
+export async function pcoPost<T>(
+  path: string,
+  body: unknown
+): Promise<PcoResponse<T>> {
+  const client = getClient();
+  const response = await client.post<PcoResponse<T>>(path, body);
+  return response.data;
+}
+
+/**
+ * PATCH request — used to update resources.
+ * Body must follow JSON:API spec: { data: { type, id, attributes } }
+ */
+export async function pcoPatch<T>(
+  path: string,
+  body: unknown
+): Promise<PcoResponse<T>> {
+  const client = getClient();
+  const response = await client.patch<PcoResponse<T>>(path, body);
+  return response.data;
+}
+
+/**
+ * DELETE request — used to remove resources.
+ * Returns true on 204 No Content (the standard PCO success response).
+ */
+export async function pcoDelete(path: string): Promise<boolean> {
+  const client = getClient();
+  const response = await client.delete(path);
+  return response.status === 204 || response.status === 200;
 }
 
 export function handlePcoError(error: unknown): string {
