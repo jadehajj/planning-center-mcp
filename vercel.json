@@ -1,18 +1,19 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
   "functions": {
-    "api/mcp.ts": {
+    "dist/api-mcp.js": {
       "maxDuration": 30
     }
   },
   "routes": [
     {
       "src": "/mcp",
-      "dest": "/api/mcp.ts"
+      "dest": "/dist/api-mcp.js"
     },
     {
       "src": "/",
-      "dest": "/api/mcp.ts"
+      "dest": "/dist/api-mcp.js"
     }
   ]
 }
